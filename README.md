@@ -161,11 +161,7 @@ main(): A função principal é responsável por:
 Inicializar o hardware (GPIOs para os LEDs, buzzer e botões).
 Criar as três tarefas usando xTaskCreate(). Note que os handles xLedTaskHandle e xBuzzerTaskHandle são passados como parâmetro para que a tarefa dos botões possa controlá-las.
 Iniciar o escalonador com vTaskStartScheduler(), que passa o controle do processador para o FreeRTOS.
-vLedTask e vBuzzerTask: São tarefas simples e periódicas. Elas executam sua lógica em um loop infinito, usando vTaskDelay() para controlar o tempo e, crucialmente, para devolver o controle da CPU ao escalonador, permitindo que outras tarefas rodem.
-
-vButtonTask: É a tarefa mais complexa.
-
-Ela possui prioridade mais alta (2 contra 1 das outras) para garantir que a leitura dos botões seja processada rapidamente.
+vLedTask e vBuzzerTask: São tarefas simples e periódicas. Elas executam sua lógica em um loop infinito, usando vTaskDelay() para controlar o tempo e, crucialmente, para devolver o controle da CPU ao escalonador, permitindo que outras tarefas rodem. vButtonTask: É a tarefa mais complexa. Ela possui prioridade mais alta (2 contra 1 das outras) para garantir que a leitura dos botões seja processada rapidamente.
 Ela implementa uma lógica de toggle: o primeiro clique suspende a tarefa alvo, e o segundo a retoma. Variáveis booleanas (led_suspended, buzzer_suspended) guardam o estado atual.
 Para robustez, após detectar um clique e realizar a ação, ela entra em um pequeno loop while (!gpio_get(...)) para esperar que o usuário solte o botão. Isso evita que um pressionamento longo acione a lógica múltiplas vezes.
 Conceitos de FreeRTOS Aplicados

@@ -12,49 +12,54 @@ if (EXISTS ${picoVscode})
     include(${picoVscode})
 endif()
 # ====================================================================================
+
 set(PICO_BOARD pico CACHE STRING "Board type")
 
 cmake_minimum_required(VERSION 3.12)
 
-# Name project
-SET(ProjectName tarefa-freertos-1-mirandabiel)
+# Nome do projeto
+set(ProjectName tarefa-freertos-1-mirandabiel)
 
-# Set any variables required for importing libraries
+# Caminho do FreeRTOS (pode ser externo ou interno ao projeto)
 if (DEFINED ENV{FREERTOS_PATH})
-  SET(FREERTOS_PATH $ENV{FREERTOS_PATH})
+  set(FREERTOS_PATH $ENV{FREERTOS_PATH})
 else()
-  SET(FREERTOS_PATH ${CMAKE_CURRENT_LIST_DIR}/FreeRTOS)
+  set(FREERTOS_PATH ${CMAKE_CURRENT_LIST_DIR}/FreeRTOS)
 endif()
 
 message("FreeRTOS Kernel located in ${FREERTOS_PATH}")
 
-# Import those libraries
+# Importa pico-sdk e o kernel do FreeRTOS
 include(pico_sdk_import.cmake)
 include(${FREERTOS_PATH}/portable/ThirdParty/GCC/RP2040/FreeRTOS_Kernel_import.cmake)
 
-# Define project
+# Define o projeto e configura padrões
 project(${ProjectName} C CXX ASM)
+set(CMAKE_C_STANDARD 11)
+set(CMAKE_CXX_STANDARD 17)
 
-# Initialize the Raspberry Pi Pico SDK
+# Inicializa SDK do Pico
 pico_sdk_init()
 
+# Arquivo principal
 add_executable(${ProjectName}
-    main.c
+    src/main.c
 )
 
+# Diretórios de include (include/ e o raiz do projeto)
 target_include_directories(${ProjectName} PRIVATE
-    ${CMAKE_CURRENT_LIST_DIR}
     ${CMAKE_CURRENT_LIST_DIR}/include
+    ${CMAKE_CURRENT_LIST_DIR}
 )
 
+# Bibliotecas utilizadas
 target_link_libraries(${ProjectName} 
     pico_stdlib 
-    FreeRTOS-Kernel-Heap4 
-    hardware_i2c
-    )
+    FreeRTOS-Kernel-Heap4
+)
 
+# Gera UF2, bin, etc.
 pico_add_extra_outputs(${ProjectName})
 
-# if you have anything in "lib" folder then uncomment below - remember to add a CMakeLists.txt
-# file to the "lib" directory
-#add_subdirectory(lib)
+# Caso você tenha libs adicionais no futuro:
+# add_subdirectory(lib)
